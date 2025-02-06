@@ -11,13 +11,24 @@ face_mesh = mediapipe_solutions.FaceMesh(refine_landmarks=True)
 left_eye = [362,385,387,263,373,380]
 right_eye = [33,160,158,133,153,144]
 
+"""Calculo de EAR com base nos landmarks"""
+def calculo_ear(leandmarks, eye_idx):
+    p1, p2, p3, p4, p5, p6 = [landmarks[i] for i in eye_idx]
+    #horizontal
+    A=np.linalg.norm(np.array(p2) - np.array(p6))
+    B=np.linalg.norm(np.array(p3) - np.array(p5))
+    #vertical
+    C=np.linalg.norm(np.array(p1) - np.array(p2))
+
+    ear = (A+B)/(2.0*C)
+    return ear
+
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
         break
 
     frame = cv2.resize(frame, (640, 416)) # 640, 480
-    #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     results = face_mesh.process(frame)
 
     if results.multi_face_landmarks:
@@ -32,6 +43,12 @@ while cap.isOpened():
                 x = int(l.x * width)
                 y = int(l.y * height)
                 landmarks.append((x, y))
+
+            # calculo de EAR
+            left_ear = calculo_ear(landmarks,left_eye)
+            right_ear = calculo_ear(landmarks,right_eye)
+            avg = (left_ear+right_ear)/2.0
+            cv2.putText(frame,f"Valor de EAR: {avg:.2f}",(30,60),cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,100),2)
 
             Xmin = min([landmarks[i][0] for i in range(len(landmarks))])
             Ymin = min([landmarks[i][1] for i in range(len(landmarks))])

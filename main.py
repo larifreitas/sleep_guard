@@ -11,6 +11,10 @@ face_mesh = mediapipe_solutions.FaceMesh(refine_landmarks=True)
 left_eye = [362,385,387,263,373,380]
 right_eye = [33,160,158,133,153,144]
 
+START_THRESH = 0.50
+CLOSED_TIME_THRESH = 5 # limiar para limite de olhos fechados
+first_time_closed = None # tempo em que os olhos começam a se fechar
+
 """Calculo de EAR com base nos landmarks"""
 def calculo_ear(leandmarks, eye_idx):
     p1, p2, p3, p4, p5, p6 = [landmarks[i] for i in eye_idx]
@@ -50,6 +54,15 @@ while cap.isOpened():
             avg = (left_ear+right_ear)/2.0
             cv2.putText(frame,f"Valor de EAR: {avg:.2f}",(30,60),cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,100),2)
 
+            # verificação pros olhos fechados
+            if avg < START_THRESH:
+                if first_time_closed is None: # se for 1ª vez que olhos fecham
+                    first_time_closed = time.time()
+                else:
+                    tempo_decorrido = time.time() - first_time_closed
+                    #TODO::aviso de sono
+                    pass
+
             Xmin = min([landmarks[i][0] for i in range(len(landmarks))])
             Ymin = min([landmarks[i][1] for i in range(len(landmarks))])
             Xmax = max([landmarks[i][0] for i in range(len(landmarks))])
@@ -62,7 +75,7 @@ while cap.isOpened():
             for i in left_eye + right_eye:
                 cv2.circle(frame[y1:y2, x1:x2], landmarks[i], 2, (0, 255, 0), -1)
 
-    cv2.imshow('Detecetor de sonolencia', frame)
+    cv2.imshow('Detector de sonolencia', frame)
     if cv2.waitKey(1) & 0xFF == ord('q') == ord(27):
         break
 

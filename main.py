@@ -3,7 +3,9 @@ import time
 import numpy as np
 import mediapipe as mp
 
-cap = cv2.VideoCapture('mulher_piscando.mp4')
+# cap = cv2.VideoCapture('mulher_piscando.mp4')
+# cap = cv2.VideoCapture('fechando_olhos.mp4')
+cap = cv2.VideoCapture(0)
 
 mediapipe_solutions = mp.solutions.face_mesh
 face_mesh = mediapipe_solutions.FaceMesh(refine_landmarks=True)
@@ -60,8 +62,11 @@ while cap.isOpened():
                     first_time_closed = time.time()
                 else:
                     tempo_decorrido = time.time() - first_time_closed
-                    #TODO::aviso de sono
-                    pass
+                    if tempo_decorrido > CLOSED_TIME_THRESH:
+                        cv2.putText(frame, "Ocorrencia de sonolencia!", (30, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255),4)
+                    
+            else:
+                tempo_decorrido = None # TODO:: AJUSTE bug
 
             Xmin = min([landmarks[i][0] for i in range(len(landmarks))])
             Ymin = min([landmarks[i][1] for i in range(len(landmarks))])
@@ -75,7 +80,7 @@ while cap.isOpened():
             for i in left_eye + right_eye:
                 cv2.circle(frame[y1:y2, x1:x2], landmarks[i], 2, (0, 255, 0), -1)
 
-    cv2.imshow('Detector de sonolencia', frame)
+    cv2.imshow('Detecetor de sonolencia', frame)
     if cv2.waitKey(1) & 0xFF == ord('q') == ord(27):
         break
 

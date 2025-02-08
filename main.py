@@ -62,11 +62,11 @@ while cap.isOpened():
                     first_time_closed = time.time()
                 else:
                     tempo_decorrido = time.time() - first_time_closed
-                    if tempo_decorrido > CLOSED_TIME_THRESH:
+                    if tempo_decorrido >= CLOSED_TIME_THRESH:
                         cv2.putText(frame, "Ocorrencia de sonolencia!", (30, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255),4)
                     
             else:
-                tempo_decorrido = None # TODO:: AJUSTE bug
+                first_time_closed = None
 
             Xmin = min([landmarks[i][0] for i in range(len(landmarks))])
             Ymin = min([landmarks[i][1] for i in range(len(landmarks))])

@@ -1,8 +1,13 @@
 import cv2
+import time
+import serial
 import mediapipe as mp
 
 from alerta_sonolencia import verificar_sonolencia
 from alerta_fadiga import verificar_fadiga
+
+arduino = serial.Serial('/dev/ttyUSB0',9600,timeout=1)
+time.sleep(2)
 
 def desenhar_olhos(frame,landmarks, left_eye, right_eye):
     for i in left_eye + right_eye:
@@ -21,7 +26,7 @@ while cap.isOpened():
     if not ret:
         break
 
-    frame = cv2.resize(frame, (640, 416)) # 640, 480
+    frame = cv2.resize(frame, (704, 480)) # 640, 480
     results = face_mesh.process(frame)
 
     if results.multi_face_landmarks:
@@ -45,8 +50,10 @@ while cap.isOpened():
             cv2.rectangle(frame, (Xmin, Ymin),(Xmax, Ymax), (100, 20, 200), 2, 2) # face bbox
             desenhar_olhos(frame, landmarks, left_eye, right_eye)
 
-            verificar_fadiga(frame,landmarks, left_eye, right_eye)
-            verificar_sonolencia(frame,landmarks, left_eye, right_eye)
+            verificar_fadiga(frame,landmarks, left_eye, right_eye,arduino)
+            verificar_sonolencia(frame,landmarks, left_eye, right_eye,arduino)
+            # verificar_fadiga(frame,landmarks, left_eye, right_eye) debug
+            # verificar_sonolencia(frame,landmarks, left_eye, right_eye) debug
 
 
     cv2.imshow('Detecetor de sonolencia', frame)

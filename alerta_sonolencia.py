@@ -23,7 +23,7 @@ def verificar_sonolencia(frame, landmarks, left_eye, right_eye, arduino):
     left_ear = calculo_ear_sonolencia(landmarks,left_eye)
     right_ear = calculo_ear_sonolencia(landmarks,right_eye)
     avg = (left_ear+right_ear)/2.0
-    print(f"Valor de EAR: {avg:.2f}")
+    #print(f"Valor de EAR: {avg:.2f}")
 
     if avg < START_THRESH:
         if first_time_closed is None: # se for 1ª vez que olhos fecham

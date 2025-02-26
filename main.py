@@ -21,6 +21,8 @@ face_mesh = mediapipe_solutions.FaceMesh(refine_landmarks=True)
 left_eye = [362,385,387,263,373,380]
 right_eye = [33,160,158,133,153,144]
 
+mouth = [13,14,78,308]
+
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
@@ -50,15 +52,17 @@ while cap.isOpened():
             cv2.rectangle(frame, (Xmin, Ymin),(Xmax, Ymax), (100, 20, 200), 2, 2) # face bbox
             desenhar_olhos(frame, landmarks, left_eye, right_eye)
 
-            verificar_fadiga(frame,landmarks, left_eye, right_eye,arduino)
+            verificar_fadiga(frame,landmarks, left_eye, right_eye,mouth,arduino)
             verificar_sonolencia(frame,landmarks, left_eye, right_eye,arduino)
             # verificar_fadiga(frame,landmarks, left_eye, right_eye) debug
             # verificar_sonolencia(frame,landmarks, left_eye, right_eye) debug
 
 
     cv2.imshow('Detecetor de sonolencia', frame)
-    if cv2.waitKey(1) & 0xFF == ord('q') == ord(27):
+    key = cv2.waitKey(1) & 0xFF
+    if key == ord('q') or key == 27:
         break
+
 
 cap.release()
 cv2.destroyAllWindows()

@@ -6,13 +6,13 @@ import mediapipe as mp
 from alerta_sonolencia import verificar_sonolencia
 from alerta_fadiga import verificar_fadiga
 
-arduino = serial.Serial('/dev/ttyUSB0',9600,timeout=1)
+#arduino = serial.Serial('/dev/ttyUSB0',9600,timeout=1)
 time.sleep(2)
 
-def desenhar_olhos(frame,landmarks, left_eye, right_eye):
-    for i in left_eye + right_eye:
+def draw_points(frame,landmarks, left_eye, right_eye, mouth):
+    for i in left_eye + right_eye + mouth:
         cv2.circle(frame,landmarks[i],2,(0,255,0), -1)
-
+    
 cap = cv2.VideoCapture(0)
 
 mediapipe_solutions = mp.solutions.face_mesh
@@ -50,12 +50,12 @@ while cap.isOpened():
             Ymax = max([landmarks[i][1] for i in range(len(landmarks))])
 
             cv2.rectangle(frame, (Xmin, Ymin),(Xmax, Ymax), (100, 20, 200), 2, 2) # face bbox
-            desenhar_olhos(frame, landmarks, left_eye, right_eye)
+            draw_points(frame, landmarks, left_eye, right_eye, mouth)
 
-            verificar_fadiga(frame,landmarks, left_eye, right_eye,mouth,arduino)
-            verificar_sonolencia(frame,landmarks, left_eye, right_eye,arduino)
-            # verificar_fadiga(frame,landmarks, left_eye, right_eye) debug
-            # verificar_sonolencia(frame,landmarks, left_eye, right_eye) debug
+            # verificar_fadiga(frame,landmarks, left_eye, right_eye,mouth,arduino)
+            # verificar_sonolencia(frame,landmarks, left_eye, right_eye,arduino)
+            verificar_fadiga(frame,landmarks, left_eye, right_eye,mouth) #debug
+            verificar_sonolencia(frame,landmarks, left_eye, right_eye) #debug
 
 
     cv2.imshow('Detecetor de sonolencia', frame)

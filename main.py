@@ -20,8 +20,10 @@ face_mesh = mediapipe_solutions.FaceMesh(refine_landmarks=True)
 
 left_eye = [362,385,387,263,373,380]
 right_eye = [33,160,158,133,153,144]
-
 mouth = [13,14,78,308]
+nose = [1]
+testa = [10]
+queixo = [1512]
 
 while cap.isOpened():
     ret, frame = cap.read()

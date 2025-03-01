@@ -17,7 +17,7 @@ def calculo_ear_sonolencia(landmarks, eye_idx):
     ear = (A+B)/(2.0*C)
     return ear
 
-def verificar_sonolencia(frame, landmarks, left_eye, right_eye):
+def verificar_sonolencia(frame, landmarks, left_eye, right_eye, arduino):
     global first_time_closed, sonolencia_triggered
 
     left_ear = calculo_ear_sonolencia(landmarks,left_eye)
@@ -32,8 +32,10 @@ def verificar_sonolencia(frame, landmarks, left_eye, right_eye):
         else:
             if time.time() - first_time_closed >= CLOSED_TIME_THRESH and not sonolencia_triggered:
                 cv2.putText(frame, "Ocorrencia de sonolencia!", (30, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255),4)
-                # arduino.write(b"SONOLENCIA\n")
+                arduino.write(b'SONOLENCIA\n')
+                arduino.flush()
                 sonolencia_triggered = True
+            elif avg >= START_THRESH: sonolencia_triggered = False 
             
     else:
         first_time_closed = None

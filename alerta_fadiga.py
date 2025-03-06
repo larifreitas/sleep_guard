@@ -7,7 +7,7 @@ from collections import deque
 # TODO: implementação de queda de cabeça
 
 # conts para fadiga
-BLINK_THRESH = 0.50 # threshold de olho fechado
+BLINK_THRESH = 0.25 # threshold de olho fechado
 TIME_WINDOW = 10 # janela de tempo pra considerar as piscadas frequentes
 BLINK_COUNT_THRESH = 15 # numero de piscadas considerado fadiga (de acordo também com limiar da janela de tempo)
 
@@ -74,12 +74,10 @@ def verificar_fadiga(frame, landmarks, left_eye, right_eye,mouth, nose, testa, q
 
     current_time = time.time()
     blink_timestamps = [t for t in blink_timestamps if  current_time - t <= TIME_WINDOW] # limpar piscadas que nao estao dentro da janela de tempo
-
-    cv2.putText(frame,f"Piscadas:({TIME_WINDOW}s): {len(blink_timestamps)}", (15,40), cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,100),2)  
     
     #::: analise com mar para bocejo
     mar = calculo_mar(landmarks,mouth)
-    print("Valor MAR: ", mar)
+    # print("Valor MAR: ", mar)
     if mar > YAWN_THRESH:
         if not yawning:
             yawning = True
@@ -106,6 +104,15 @@ def verificar_fadiga(frame, landmarks, left_eye, right_eye,mouth, nose, testa, q
     elif len(queda_timestamps) < THRESHOLD_FALLS: 
         fadiga_cabeca_triggered = False # reset
 
+    print(f"Piscadas registradas: {len(blink_timestamps)}, Bocejos: {len(YAWN_TIMESTAMPS)}")
+
+    #debug
+    if ((len(blink_timestamps) >= BLINK_COUNT_THRESH) or 
+        (len(blink_timestamps) >= YAWNING_BLINKS and len(YAWN_TIMESTAMPS) > 0)) and not fadiga_triggered:
+    
+        print("ALARME DE FADIGA")
+    ##
+
     # acionamento de alarme para piscadas e combinação de piscadas com bocejo
     if ((len(blink_timestamps) >= BLINK_COUNT_THRESH) or (len(blink_timestamps) >= YAWNING_BLINKS and len(YAWN_TIMESTAMPS) > 0)) and not fadiga_triggered:
         if time.time() - CONTROL_ALERT >= FREEZE:
@@ -114,5 +121,5 @@ def verificar_fadiga(frame, landmarks, left_eye, right_eye,mouth, nose, testa, q
             fadiga_triggered = True
             CONTROL_ALERT = time.time()
 
-    if len(blink_timestamps) < BLINK_COUNT_THRESH:
+    if len(blink_timestamps) < BLINK_COUNT_THRESH and len(YAWN_TIMESTAMPS) == 0:
         fadiga_triggered=False

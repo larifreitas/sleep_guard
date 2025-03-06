@@ -7,7 +7,8 @@ from alerta_sonolencia import verificar_sonolencia
 from alerta_fadiga import verificar_fadiga
 # TODO: VERIFICAÇÃO DE PEQUENOS BUGS nas funções de acordo com beeps do buzzer
 arduino = serial.Serial('/dev/ttyUSB0',9600,timeout=1)
-time.sleep(2)
+time.sleep(3)
+arduino.flushInput()
 
 
 def draw_points(frame,landmarks, left_eye, right_eye, mouth,nose, testa, queixo, Xmin,Ymin, Xmax,Ymax):
@@ -58,8 +59,6 @@ while cap.isOpened():
 
             verificar_fadiga(frame,landmarks, left_eye, right_eye,mouth,nose, testa, queixo, arduino)
             verificar_sonolencia(frame,landmarks, left_eye, right_eye, arduino)
-            # verificar_fadiga(frame,landmarks, left_eye, right_eye,mouth) #debug
-            # verificar_sonolencia(frame,landmarks, left_eye, right_eye) #debug
 
 
     cv2.imshow('Detecetor de sonolencia', frame)

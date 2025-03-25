@@ -14,7 +14,7 @@ arduino.flushInput()
 def draw_points(frame,landmarks, left_eye, right_eye, mouth,nose, testa, queixo, Xmin,Ymin, Xmax,Ymax):
     for i in left_eye + right_eye + mouth:
         cv2.circle(frame,landmarks[i],2,(0,255,0), -1)
-        cv2.rectangle(frame, (Xmin, Ymin),(Xmax, Ymax), (100, 20, 200), 2, 2) # face bbox
+        cv2.rectangle(frame, (Xmin, Ymin),(Xmax, Ymax), (100, 20, 200), 2, 2)
     
 cap = cv2.VideoCapture(0)
 
@@ -33,7 +33,7 @@ while cap.isOpened():
     if not ret:
         break
 
-    frame = cv2.resize(frame, (704, 480)) # 640, 480
+    frame = cv2.resize(frame, (1024, 728)) # 640, 480
     results = face_mesh.process(frame)
 
     if results.multi_face_landmarks:

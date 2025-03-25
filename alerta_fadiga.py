@@ -5,15 +5,16 @@ from collections import deque
 
 # TODO:documentar
 # TODO: implementação de queda de cabeça
+# 10 piscadas no limiar de 15 segundos
 
-# conts para fadiga
-BLINK_THRESH = 0.25 # threshold de olho fechado
-TIME_WINDOW = 10 # janela de tempo pra considerar as piscadas frequentes
-BLINK_COUNT_THRESH = 15 # numero de piscadas considerado fadiga (de acordo também com limiar da janela de tempo)
+# conts para piscadas
+BLINK_THRESH = 0.38 # threshold de olho fechado
+TIME_WINDOW = 15 # janela de tempo pra considerar as piscadas frequentes
+BLINK_COUNT_THRESH = 10 # numero de piscadas considerado fadiga (de acordo também com limiar da janela de tempo)
 
 # consts para bocejo
 YAWN_THRESH = 0.7 # threshOLD para o bocejo
-YAWNING_BLINKS = 10
+YAWNING_BLINKS = 8 # piscada com bocejo
 CONTROL_ALERT =0 # controle de alertapara não ser acionado próximo do tempo em que já foi acionado
 FREEZE = 30 # "congelar" o acionamento do alarme para não acionar beeps consecultivos logo após o acionamento de alerme
 
@@ -33,7 +34,7 @@ fadiga_triggered = False
 queda_timestamps = deque()
 fadiga_cabeca_triggered = False
 
-def angulo_cabeca(p1,p2):
+def angulo_cabeca(p1,p2):########
     y = p2[1] - p1[1]
     x = p2[0] - p1[0]
 
@@ -60,11 +61,19 @@ def calculo_mar(landmarks,mouth):
 
 def verificar_fadiga(frame, landmarks, left_eye, right_eye,mouth, nose, testa, queixo, arduino):
     global blink_timestamps, blincking, fadiga_triggered, YAWN_TIMESTAMPS, yawning, CONTROL_ALERT, fadiga_cabeca_triggered
-
+    
+    ######################################################################################
     #:::analise com ear para piscadas
     left_ear = calculo_ear(landmarks, left_eye)
     right_ear = calculo_ear(landmarks,right_eye)
     avg_ear =(left_ear + right_ear)/2.0
+
+    # debug
+    cor = (0, 255, 0) if avg_ear > BLINK_THRESH else (0, 0, 255)
+    cv2.putText(frame, f"EAR: {avg_ear:.3f}", (15, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.8, cor, 2)
+    print(f"EAR médio: {avg_ear:.3f}")
+    ###
+
     if avg_ear < BLINK_THRESH:
         if not blincking:
             blincking = True
@@ -92,7 +101,9 @@ def verificar_fadiga(frame, landmarks, left_eye, right_eye,mouth, nose, testa, q
     queixo = landmarks[queixo[0]]
     testa = landmarks[testa[0]]
     angulo_atual=angulo_cabeca(nose,queixo)
-    queda_timestamps.append(time.time())
+
+    if angulo_atual >  ANGLE_THRESH:
+        queda_timestamps.append(time.time())
 
     while queda_timestamps and (time.time() - queda_timestamps[0] > INSTERVAL_FALLS):
         queda_timestamps.popleft()
@@ -103,14 +114,14 @@ def verificar_fadiga(frame, landmarks, left_eye, right_eye,mouth, nose, testa, q
         fadiga_cabeca_triggered = True
     elif len(queda_timestamps) < THRESHOLD_FALLS: 
         fadiga_cabeca_triggered = False # reset
-
-    print(f"Piscadas registradas: {len(blink_timestamps)}, Bocejos: {len(YAWN_TIMESTAMPS)}")
+    
+    #########################################################################
 
     #debug
     if ((len(blink_timestamps) >= BLINK_COUNT_THRESH) or 
         (len(blink_timestamps) >= YAWNING_BLINKS and len(YAWN_TIMESTAMPS) > 0)) and not fadiga_triggered:
-    
-        print("ALARME DE FADIGA")
+        arduino.write(b"FADIGA\n")
+        print(blink_timestamps)
     ##
 
     # acionamento de alarme para piscadas e combinação de piscadas com bocejo
@@ -123,3 +134,12 @@ def verificar_fadiga(frame, landmarks, left_eye, right_eye,mouth, nose, testa, q
 
     if len(blink_timestamps) < BLINK_COUNT_THRESH and len(YAWN_TIMESTAMPS) == 0:
         fadiga_triggered=False
+
+
+    # acionamento para queda de cabeça
+    if len(queda_timestamps) >= THRESHOLD_FALLS and not fadiga_cabeca_triggered:
+        if arduino:
+            arduino.write(b'FADIGA_2')
+        fadiga_cabeca_triggered = True
+    elif len(queda_timestamps) <THRESHOLD_FALLS:
+        fadiga_cabeca_triggered = False ## reset

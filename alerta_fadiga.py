@@ -117,13 +117,6 @@ def verificar_fadiga(frame, landmarks, left_eye, right_eye,mouth, nose, testa, q
     
     #########################################################################
 
-    #debug
-    if ((len(blink_timestamps) >= BLINK_COUNT_THRESH) or 
-        (len(blink_timestamps) >= YAWNING_BLINKS and len(YAWN_TIMESTAMPS) > 0)) and not fadiga_triggered:
-        arduino.write(b"FADIGA\n")
-        print(blink_timestamps)
-    ##
-
     # acionamento de alarme para piscadas e combinação de piscadas com bocejo
     if ((len(blink_timestamps) >= BLINK_COUNT_THRESH) or (len(blink_timestamps) >= YAWNING_BLINKS and len(YAWN_TIMESTAMPS) > 0)) and not fadiga_triggered:
         if time.time() - CONTROL_ALERT >= FREEZE:

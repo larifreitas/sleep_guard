@@ -30,7 +30,7 @@ while cap.isOpened():
     if not ret:
         break
 
-    frame = cv2.resize(frame, (1024, 728)) # 640, 480
+    frame = cv2.resize(frame, (1024, 728))
     results = face_mesh.process(frame)
 
     if results.multi_face_landmarks:
@@ -51,14 +51,13 @@ while cap.isOpened():
             Xmax = max([landmarks[i][0] for i in range(len(landmarks))])
             Ymax = max([landmarks[i][1] for i in range(len(landmarks))])
 
-            # cv2.rectangle(frame, (Xmin, Ymin),(Xmax, Ymax), (100, 20, 200), 2, 2) # face bbox
             draw_points(frame, landmarks, left_eye, right_eye, mouth,nose ,Xmin, Ymin, Xmax, Ymax)
 
             verificar_fadiga(frame,landmarks, left_eye, right_eye,mouth,nose, arduino)
             verificar_sonolencia(frame,landmarks, left_eye, right_eye, arduino)
 
 
-    cv2.imshow('Detecetor de sonolencia', frame)
+    cv2.imshow('Detecetor de fadiga', frame)
     key = cv2.waitKey(1) & 0xFF
     if key == ord('q') or key == 27:
         break

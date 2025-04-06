@@ -5,15 +5,14 @@ import mediapipe as mp
 
 from alerta_sonolencia import verificar_sonolencia
 from alerta_fadiga import verificar_fadiga
-# TODO: VERIFICAÇÃO DE PEQUENOS BUGS nas funções de acordo com beeps do buzzer
 arduino = serial.Serial('/dev/ttyUSB0',9600,timeout=1)
 time.sleep(3)
 arduino.flushInput()
 
 
-def draw_points(frame,landmarks, left_eye, right_eye, mouth,nose, testa, queixo, Xmin,Ymin, Xmax,Ymax):
-    for i in left_eye + right_eye + mouth:
-        cv2.circle(frame,landmarks[i],2,(0,255,0), -1)
+def draw_points(frame,landmarks, left_eye, right_eye, mouth,nose, Xmin,Ymin, Xmax,Ymax):
+    for i in left_eye + right_eye + mouth + nose:
+        cv2.circle(frame,landmarks[i],4,(0,255,0), -1)
         cv2.rectangle(frame, (Xmin, Ymin),(Xmax, Ymax), (100, 20, 200), 2, 2)
     
 cap = cv2.VideoCapture(0)
@@ -25,8 +24,6 @@ left_eye = [362,385,387,263,373,380]
 right_eye = [33,160,158,133,153,144]
 mouth = [13,14,78,308]
 nose = [1]
-testa = [10]
-queixo = [152]
 
 while cap.isOpened():
     ret, frame = cap.read()
@@ -55,9 +52,9 @@ while cap.isOpened():
             Ymax = max([landmarks[i][1] for i in range(len(landmarks))])
 
             # cv2.rectangle(frame, (Xmin, Ymin),(Xmax, Ymax), (100, 20, 200), 2, 2) # face bbox
-            draw_points(frame, landmarks, left_eye, right_eye, mouth,nose, testa, queixo ,Xmin, Ymin, Xmax, Ymax)
+            draw_points(frame, landmarks, left_eye, right_eye, mouth,nose ,Xmin, Ymin, Xmax, Ymax)
 
-            verificar_fadiga(frame,landmarks, left_eye, right_eye,mouth,nose, testa, queixo, arduino)
+            verificar_fadiga(frame,landmarks, left_eye, right_eye,mouth,nose, arduino)
             verificar_sonolencia(frame,landmarks, left_eye, right_eye, arduino)
 
 

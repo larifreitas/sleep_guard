@@ -6,7 +6,7 @@ import mediapipe as mp
 from alerta_sonolencia import verificar_sonolencia
 from alerta_fadiga import verificar_fadiga
 
-USE_ARDUINO = False
+USE_ARDUINO = True
 
 if USE_ARDUINO == True:
     arduino = serial.Serial('/dev/ttyUSB0',9600,timeout=1)
@@ -16,7 +16,7 @@ else:
     class FakeArduino:
         def write(self,msg):
             print("Modo de simulação com arduino. Mensagem recebida de arduino: :", msg.decode().strip())
-            def flush(self): pass
+        def flush(self): pass
     arduino=FakeArduino()
 
 
@@ -65,7 +65,7 @@ while cap.isOpened():
             draw_points(frame, landmarks, left_eye, right_eye, mouth,nose ,Xmin, Ymin, Xmax, Ymax)
 
             verificar_fadiga(frame,landmarks, left_eye, right_eye,mouth,nose, arduino)
-            verificar_sonolencia(frame,landmarks, left_eye, right_eye, arduino)
+            verificar_sonolencia(frame,landmarks, left_eye, right_eye, arduino, USE_ARDUINO)
 
 
     cv2.imshow('Detecetor de fadiga', frame)

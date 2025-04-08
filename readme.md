@@ -1,6 +1,6 @@
 # <center> SLEEP GUARD: Detecção de fadiga com Visão Computacional e acionamento de alarme </center>
 <br></br>
-### Utiliza MediaPipe, OpenCV, e Arduino para detectar sinais de sonolência e fadiga em tempo real, com base em movimentos faciais como piscadas, bocejos e quedas de cabeça para selecionar alarme 🚨
+### Utiliza MediaPipe, OpenCV, e Arduino para detectar sinais de sonolência e fadiga em tempo real, com base em movimentos faciais como piscadas, bocejos e quedas de cabeça para acionar alarme 🚨
 ##
 
 ### 👁 Piscadas (EAR - Eye Aspect Ratio)
@@ -14,7 +14,7 @@
 - `CONTROL_ALERT = 5`: Intervalo (em segundos) entre acionar alertas consecultivos
 - `FREEZE = 10`: "congelar" o acionamento do alarme para não acionar beeps consecultivos logo após o acionamento de alerme
 
-### 🙂‍↕️ Queda de Cabeça (posição vertical do nariz)
+### 🙂‍↕️ Queda de Cabeça (Ponto do nariz, para analisar posição Y (vertical))
 - `TRESH_NOSE_Y = 400`: considerando vertical (como ponto Y) - Quanto menor, mais sensível à queda; Quanto maior, menos sensível
 - `INSTERVAL_FALLS = 1`: Intervalo (em segunos) entre cada queda de cabeça
 - `THRESHOLD_FALLS = 2`: Número de quedas de cabeça por intervalo (INTERVAL_FALLS)

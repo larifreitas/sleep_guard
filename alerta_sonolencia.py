@@ -5,8 +5,8 @@ import time
 # limiares para olhos fechados
 START_THRESH = 0.50
 CLOSED_TIME_THRESH = 5
-first_time_closed = None
-sonolencia_triggered = False  # flag para saber se o alarme já foi disparado
+first_time_closed = None # Timestamp desde o inicio em que os olhos foram fechados
+sonolencia_triggered = False  # Flag para saber se o alarme já foi disparado
 
 def calculo_ear_sonolencia(landmarks, eye_idx):
     p1, p2, p3, p4, p5, p6 = [landmarks[i] for i in eye_idx]
@@ -16,7 +16,7 @@ def calculo_ear_sonolencia(landmarks, eye_idx):
     ear = (A+B)/(2.0*C)
     return ear
 
-def verificar_sonolencia(frame, landmarks, left_eye, right_eye, arduino):
+def verificar_sonolencia(frame, landmarks, left_eye, right_eye, arduino,USE_ARDUINO):
     global first_time_closed, sonolencia_triggered
 
     left_ear = calculo_ear_sonolencia(landmarks,left_eye)
@@ -33,7 +33,8 @@ def verificar_sonolencia(frame, landmarks, left_eye, right_eye, arduino):
                 cv2.putText(frame, "Ocorrencia de sonolencia!", (30, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255),4)
                 arduino.write(b'SONOLENCIA\n')
                 print("Ocorreência de sonolência (10 beeps)")
-                arduino.flush()
+                if USE_ARDUINO:
+                    arduino.flush()
                 sonolencia_triggered = True            
     else:
         first_time_closed = None

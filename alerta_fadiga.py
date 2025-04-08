@@ -15,7 +15,7 @@ CONTROL_ALERT = 5 # controle de alertapara não ser acionado próximo do tempo e
 FREEZE = 10 # "congelar" o acionamento do alarme para não acionar beeps consecultivos logo após o acionamento de alerme
 
 # limiares para caso de queda cabeça
-TRESH_NOSE_Y = 400 # posição y (vertical do nariz)
+TRESH_NOSE_Y = 400 # posição Y (vertical do nariz)
 INSTERVAL_FALLS = 1 # INTERVALO ENTRE CADA QUEDA DE CABEÇA
 THRESHOLD_FALLS = 2 # QUANTAS QUEDAS DE CABEÇA por intervalo
 
@@ -53,6 +53,7 @@ def detectar_fadiga_bocejo(blink_timestamps, YAWN_TIMESTAMPS, frame, arduino):
         if time.time() - CONTROL_ALERT >= FREEZE:
             cv2.putText(frame, "Fadiga detectada", (20, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,100,255),2)
             arduino.write(b"FADIGA\n")
+            print("Ocorrência de fadiga (1 beep)")
             fadiga_triggered = True
             CONTROL_ALERT = time.time()
             blink_timestamps.clear()
@@ -64,6 +65,7 @@ def detectar_fadiga_piscadas(blink_timestamps, YAWN_TIMESTAMPS, arduino):
     if len(blink_timestamps) >= BLINK_COUNT_THRESH and len(YAWN_TIMESTAMPS) == 0 and not fadiga_triggered:
         if time.time() - CONTROL_ALERT >= FREEZE:
             arduino.write(b"FADIGA\n")
+            print("Ocorrência de fadiga (1 beep)")
             fadiga_triggered = True
             CONTROL_ALERT = time.time()
             blink_timestamps.clear()
@@ -73,6 +75,7 @@ def detectar_queda_cabeca(queda_timestamps, arduino):
     global fadiga_cabeca_triggered
     if len(queda_timestamps) >= THRESHOLD_FALLS and not fadiga_cabeca_triggered:
         arduino.write(b'FADIGA_2\n')
+        print("Ocorrência de fadiga (2 beeps)")
         fadiga_cabeca_triggered = True
     elif len(queda_timestamps) < THRESHOLD_FALLS:
         fadiga_cabeca_triggered = False

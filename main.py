@@ -5,9 +5,19 @@ import mediapipe as mp
 
 from alerta_sonolencia import verificar_sonolencia
 from alerta_fadiga import verificar_fadiga
-arduino = serial.Serial('/dev/ttyUSB0',9600,timeout=1)
-time.sleep(3)
-arduino.flushInput()
+
+USE_ARDUINO = False
+
+if USE_ARDUINO == True:
+    arduino = serial.Serial('/dev/ttyUSB0',9600,timeout=1)
+    time.sleep(3)
+    arduino.flushInput()
+else: 
+    class FakeArduino:
+        def write(self,msg):
+            print("Modo de simulação com arduino. Mensagem recebida de arduino: :", msg.decode().strip())
+            def flush(self): pass
+    arduino=FakeArduino()
 
 
 def draw_points(frame,landmarks, left_eye, right_eye, mouth,nose, Xmin,Ymin, Xmax,Ymax):

@@ -32,6 +32,7 @@ def verificar_sonolencia(frame, landmarks, left_eye, right_eye, arduino):
             if time.time() - first_time_closed >= CLOSED_TIME_THRESH and not sonolencia_triggered:
                 cv2.putText(frame, "Ocorrencia de sonolencia!", (30, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255),4)
                 arduino.write(b'SONOLENCIA\n')
+                print("Ocorreência de sonolência (10 beeps)")
                 arduino.flush()
                 sonolencia_triggered = True            
     else:
